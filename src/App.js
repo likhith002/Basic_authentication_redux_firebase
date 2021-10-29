@@ -17,7 +17,7 @@ function App() {
 
   const signout = () => {
 
-    //signOut(auth).then(() => { dispatch(setuserlogout) }).catch((err) => console.log(err), alert('error occured'))
+    
     signOut(auth).then(() => {
       // Sign-out successful.
 
