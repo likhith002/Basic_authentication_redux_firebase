@@ -1,56 +1,67 @@
 import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
+
 import './App.css';
 
+import { auth, provider } from './firebase';
+import { useDispatch, useSelector } from 'react-redux'
+import { setuser, setuserlogout, selectusername, selectuseremail } from './features/UserSlice'
+import { signInWithPopup,signOut } from "firebase/auth"
+
+
 function App() {
+
+  const dispatch = useDispatch()
+  const username = useSelector(selectusername)
+  const useremail = useSelector(selectuseremail)
+
+
+  const signout = () => {
+
+    //signOut(auth).then(() => { dispatch(setuserlogout) }).catch((err) => console.log(err), alert('error occured'))
+    signOut(auth).then(() => {
+      // Sign-out successful.
+
+      dispatch(setuserlogout())
+
+    }).catch((error) => {
+      // An error happened.
+    });
+  }
+
+  const signin = () => {
+
+    signInWithPopup(auth, provider)
+  .then((result) => {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+   dispatch(setuser({
+     username:result.user.displayName,
+     useremail:result.user.email
+   }))
+    const user = result.user;
+    // ...
+  }).catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.email;
+    // The AuthCredential type that was used.
+  
+    // ...
+  });
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+
+      {
+        username ? (
+          <button onClick={signout}>Sign Out</button>
+        ) :
+          (
+            <button onClick={signin}> Sign In</button>
+          )
+      }
+
     </div>
   );
 }
